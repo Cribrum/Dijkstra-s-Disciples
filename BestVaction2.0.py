@@ -14,6 +14,7 @@ def solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList
 				Time += (attractions[i][2] - (Time + globalTime - attractions[i][5]))
 			#print(Time)
 			#print(i)
+			attractions[i][6] = Time
 			if (Time > 0):
 				utilPerTimes.append([attractions[i][4]/Time, Time, i])
 			else:
@@ -25,26 +26,26 @@ def solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList
 		nextJob = []
 		for i in range(N):
 			TimeBackToEnd = math.ceil(math.sqrt(pow((200 - attractions[utilPerTimes[i][2]][0]), 2) + pow((200 - attractions[utilPerTimes[i][2]][1]), 2)))
-			if (((globalTime + utilPerTimes[i][1] - attractions[utilPerTimes[i][2]][5]) <= attractions[utilPerTimes[i][2]][3]) and (attractions[utilPerTimes[i][2]][6] == False) and ((globalTime + utilPerTimes[i][1] + TimeBackToEnd) < 1440)):
+			if (((globalTime + utilPerTimes[i][1] - attractions[utilPerTimes[i][2]][5]) <= attractions[utilPerTimes[i][2]][3]) and (attractions[utilPerTimes[i][2]][7] == False) and ((globalTime + utilPerTimes[i][1] + TimeBackToEnd) < 1440)):
 				#simulated annealing stuff (globalTime is overall time in journey)
-				attractions[utilPerTimes[i][2]][7] = globalTime
 				nextJob = [attractions[utilPerTimes[i][2]], utilPerTimes[i], i]
-				attractions[utilPerTimes[i][2]][6] = True
+				attractions[utilPerTimes[i][2]][7] = True
+				attractions[utilPerTimes[i][2]][8] = globalTime
 				break
 		if (len(nextJob) == 0):
 			break
 		globalTime += nextJob[1][1]
 		#globalTime += nextJob[0][5]
-		if (globalTime <= 1440):
+		if (globalTime <= 1440): # might have to account for this in simulated_annealing if running into issues
 			#print(globalTime)
 			finalAttractionList.append(nextJob[1][2] + 1)
 			finalUtilVal += nextJob[0][4]
 			#print(finalUtilVal)
 			currPos = (nextJob[0][0], nextJob[0][1])
-	return len(finalAttractionList), finalAttractionList, finalUtilVal, attractions, utilPerTimes
+	return len(finalAttractionList), finalAttractionList, finalUtilVal, attractions
 	
-def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList):
-	numBestAttractions, listBestAttractions, finalUtilVal, attractions, utilPerTimes = solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)
+def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList, epoch, attraction_util_dict, numBestAttractions, listBestAttractions):
+	# numBestAttractions, listBestAttractions, finalUtilVal, attractions = solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)
 	temp_list = [1/(numBestAttractions * (.2*i+1)) for i in range(numBestAttractions)]
 	total = 0
 	for i in range(len(temp_list)):
@@ -53,7 +54,7 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 	curr_edge = np.random.choice(listBestAttractions, p=p_list) # The random edge we are breaking greedy from
 	curr_edge_best_attraction_index = listBestAttractions.index(curr_edge)
 	if curr_edge == listBestAttractions[-1]: # if there are no edges after the current_edge (ex. if we only visit one edge), return the greedy output
-		return numBestAttractions, listBestAttractions, finalUtilVal, attractions, utilPerTimes
+		return numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
 	else:
 		# print(utilPerTimes)
 		print(curr_edge)
@@ -61,46 +62,94 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 		# print(attractions)
 		# print(attractions[curr_edge-1])
 		curr_attraction = attractions[curr_edge-1]
-		globalTime = curr_attraction[7] # updates global time to reflect we are at curr_attraction
+		globalTime = curr_attraction[8] # updates global time to reflect we are at curr_attraction
 
+		attractions_visited = []
 		for best_attraction in listBestAttractions:
 			if listBestAttractions.index(best_attraction) > curr_edge_best_attraction_index:
-				# attractions[utilPerTimes[best_attraction-1][2]][6] = False
-				attractions[best_attraction-1][6] = False
+				# attractions[utilPerTimes[best_attraction-1][2]][7] = False
+				attractions[best_attraction-1][7] = False
+			else:
+				attractions_visited.append(best_attraction)
 		
 		# print(attractions)
 
-		print(globalTime)
+		# print(globalTime)
 
 
 		# for i in range(listBestAttractions.index(curr_edge), len(listBestAttractions)):
 		# 	attractions[]
 
-		valid_next_attractions = []
+		# valid_next_attractions = []
+		valid_next_indices = []
 		for i in range(N):
-			TimeBackToEnd = math.ceil(math.sqrt(pow((200 - attractions[utilPerTimes[i][2]][0]), 2) + pow((200 - attractions[utilPerTimes[i][2]][1]), 2)))
-			print(utilPerTimes[i][1])
-			print(attractions[utilPerTimes[i][2]][5])
-			print(attractions[utilPerTimes[i][2]][3])
-			if (((globalTime + utilPerTimes[i][1] - attractions[utilPerTimes[i][2]][5]) <= attractions[utilPerTimes[i][2]][3]) and (attractions[utilPerTimes[i][2]][6] == False) and ((globalTime + utilPerTimes[i][1] + TimeBackToEnd) < 1440)):
+			TimeBackToEnd = math.ceil(math.sqrt(pow((200 - attractions[i][0]), 2) + pow((200 - attractions[i][1]), 2)))
+			# print(attractions[i][5])
+			# print(attractions[i][3])
+			if (((globalTime + attractions[i][6] - attractions[i][5]) <= attractions[i][3]) and (attractions[i][7] == False) and ((globalTime + attractions[i][6] + TimeBackToEnd) < 1440)):
 				#simulated annealing stuff (globalTime is overall time in journey)
-				attractions[utilPerTimes[i][2]][7] = globalTime
-				# nextJob = [attractions[utilPerTimes[i][2]], utilPerTimes[i], i]
-				attractions[utilPerTimes[i][2]][6] = True
-				valid_next_attractions.append(attractions[utilPerTimes[i][2]]) # if I am getting weird ouput, mayb this should just be i? I have no idea how the indexing works
-				# valid_next_attractions.append(attractions[i])
+				attractions[i][8] = globalTime
+				valid_next_indices.append(i)
+				# valid_next_attractions.append(attractions[i]) # if I am getting weird ouput, mayb this should just be i? I have no idea how the indexing works
 		
-		print(valid_next_attractions)
+		# print(valid_next_attractions)
 
-		curr_new_edge = random.choice(valid_next_attractions)
+		if valid_next_indices == []: # TODO: Figure out why this would be empty (shouldn't be since Greedy finds val)
+			return numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
 
-		print(curr_new_edge)
+		# new_edge = random.choice(valid_next_attractions)
+
+		new_edge = random.choice(valid_next_indices)
+
+		attractions_visited.append(new_edge)
+
+		print(new_edge)
+
+
+		attractions[new_edge-1][7] = True
+
+		globalTime += attractions[new_edge-1][6]
+
+		new_numBestAttractions, new_listBestAttractions, new_finalUtilVal, attractions = solve(N, attractions, [attractions[new_edge-1][0], attractions[new_edge-1][1]], globalTime, finalUtilVal, attractions_visited)
+
+		if new_finalUtilVal > finalUtilVal:
+			return new_numBestAttractions, new_listBestAttractions, new_finalUtilVal, attractions, epoch, attraction_util_dict
+		else:
+			thresh = random.uniform(0,1)
+			temperature = 100000 - .01 * epoch
+			exp_val = (finalUtilVal - new_finalUtilVal)/temperature
+			p = math.exp(exp_val)
+			if p > thresh:
+				attraction_util_dict[finalUtilVal] = numBestAttractions, listBestAttractions
+				return new_numBestAttractions, new_listBestAttractions, new_finalUtilVal, attractions, epoch, attraction_util_dict
+			else:
+				return numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
+
 
 
 		
 
 		# print(numBestAttractions, listBestAttractions, finalUtilVal, attractions)
 		return 0
+
+def run_simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList):
+	epoch = 1
+	attraction_util_dict = {}
+	numBestAttractions, listBestAttractions, finalUtilVal, attractions = solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)
+
+
+	while epoch < 100:
+		numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict = simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList,epoch, attraction_util_dict, numBestAttractions, listBestAttractions)
+		epoch += 1
+	print(attraction_util_dict)
+	if attraction_util_dict == {}:
+		return numBestAttractions, listBestAttractions
+	elif finalUtilVal >= max(attraction_util_dict):
+		return numBestAttractions, listBestAttractions
+	else:
+		return attraction_util_dict[max(attraction_util_dict)]
+	# return max(new_finalUtilVal, max(attraction_util_dict))
+
 
 
 def read_input():
@@ -118,7 +167,7 @@ def read_data(f):
 	attractions = []
 	for i in range(N):
 		x, y, o, c, u, t = [int(i) for i in f.readline().split()]
-		attractions.append([x, y, o, c, u, t, False, 0])
+		attractions.append([x, y, o, c, u, t, False, 0, 0])
 	return N, attractions
 
 
@@ -160,12 +209,12 @@ def main():
 			globalTime = 0
 			finalUtilVal = 0
 			finalAttractionList = []
-			numBestAttractions, listBestAttractions, finalUtilVal, attractions, utilPerTimes = solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)
+			numBestAttractions, listBestAttractions, finalUtilVal, attractions = solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)
 			# print(numBestAttractions)
 			# print(listBestAttractions)
 			# print(finalUtilVal)
 			# print(attractions)
-			simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)
+			run_simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)
 
 			# UNCOMMENT WHEN READY TO RUN:
 			# combined2 = "/Users/ariwilson/Desktop/Algorithms/Dijkstra-s-Disciples/all_outputs" + str("/") + str(filename)
