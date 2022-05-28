@@ -54,7 +54,7 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 	try:
 		curr_edge = np.random.choice(listBestAttractions, p=p_list) # The random edge we are breaking greedy from
 	except:
-		return numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
+		return len(listBestAttractions), listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
 	curr_edge_best_attraction_index = listBestAttractions.index(curr_edge)
 	if curr_edge == listBestAttractions[-1]: # if there are no edges after the current_edge (ex. if we only visit one edge), return the greedy output
 		return len(listBestAttractions), listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
@@ -241,8 +241,11 @@ def main():
 			f2.write(str(numBestAttractions))
 			f2.write("\n")
 			for i in range(numBestAttractions):
+
+				# for understanding output
 				print(i)
 				print(len(listBestAttractions))
+
 				if (i < (numBestAttractions-1)):
 					f2.write(str(listBestAttractions[i]))
 					f2.write(" ")
