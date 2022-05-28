@@ -89,12 +89,12 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 		valid_next_indices = []
 		for i in range(N):
 			TimeBackToEnd = math.ceil(math.sqrt(pow((200 - attractions[i][0]), 2) + pow((200 - attractions[i][1]), 2)))
-			# print(attractions[i][6])
-			# print(attractions[i][5])
-			# print(attractions[i][3])
-			if (((globalTime + attractions[i][6] - attractions[i][5]) <= attractions[i][3]) and (attractions[i][7] == False) and ((globalTime + attractions[i][6] + TimeBackToEnd) < 1440)):
+			print(attractions[i][6])
+			print(attractions[i][5])
+			print(attractions[i][3])
+			if (((globalTime - attractions[i][5]) <= attractions[i][3]) and (attractions[i][7] == False) and ((globalTime + TimeBackToEnd) < 1440)):
 				#simulated annealing stuff (globalTime is overall time in journey)
-				attractions[i][8] = globalTime
+				# attractions[i][8] = globalTime
 				valid_next_indices.append(i)
 				# valid_next_attractions.append(attractions[i]) # if I am getting weird ouput, mayb this should just be i? I have no idea how the indexing works
 		
@@ -102,6 +102,7 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 
 		if valid_next_indices == []: # TODO: Figure out why this would be empty (shouldn't be since Greedy finds val)
 			# return len(listBestAttractions), listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
+
 			print(curr_edge)
 			print(curr_attraction)
 			print(finalAttractionList)
