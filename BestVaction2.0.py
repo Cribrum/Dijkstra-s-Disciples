@@ -30,7 +30,7 @@ def solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList
 				#simulated annealing stuff (globalTime is overall time in journey)
 				nextJob = [attractions[utilPerTimes[i][2]], utilPerTimes[i], i]
 				attractions[utilPerTimes[i][2]][7] = True
-				attractions[utilPerTimes[i][2]][8] = globalTime
+				attractions[utilPerTimes[i][2]][8] = globalTime # should this maybe be plus time?
 				break
 		if (len(nextJob) == 0):
 			break
@@ -171,7 +171,7 @@ def read_input():
     attractions = []
     for i in range(N):
         x, y, o, c, u, t = [int(i) for i in input().split()]
-        attractions.append([x, y, o, c, u, t, False])
+        attractions.append([x, y, o, c, u, t, 0, False, 0])
     return N, attractions
 
 def read_data(f):
@@ -180,7 +180,7 @@ def read_data(f):
 	attractions = []
 	for i in range(N):
 		x, y, o, c, u, t = [int(i) for i in f.readline().split()]
-		attractions.append([x, y, o, c, u, t, False, 0, 0])
+		attractions.append([x, y, o, c, u, t, 0, False, 0])
 	return N, attractions
 
 
