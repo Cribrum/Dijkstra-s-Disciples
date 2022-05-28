@@ -147,6 +147,8 @@ def run_simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, f
 
 	while epoch < 100:
 		numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict = simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList,epoch, attraction_util_dict, numBestAttractions, listBestAttractions)
+		# print(numBestAttractions)
+		# print(len(listBestAttractions))
 		epoch += 1
 	# print(attraction_util_dict)
 	if attraction_util_dict == {}:
@@ -221,6 +223,8 @@ def main():
 			finalUtilVal = 0
 			finalAttractionList = []
 			numBestAttractions, listBestAttractions, finalUtilVal, attractions = solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)
+			
+			
 			# print(numBestAttractions)
 			# print(listBestAttractions)
 
@@ -228,9 +232,10 @@ def main():
 			# print(finalUtilVal)
 
 			# print(attractions)
-			numBestAttractions = run_simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)[0]
+			# numBestAttractions = run_simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)[0]
 			listBestAttractions = run_simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)[1]
-			print(listBestAttractions)
+			# print(len(listBestAttractions))
+			# print(numBestAttractions)
 
 			# UNCOMMENT WHEN READY TO RUN:
 			combined2 = "/Users/ariwilson/Desktop/Algorithms/Dijkstra-s-Disciples/all_outputs" + str("/") + str(filename)
@@ -238,20 +243,18 @@ def main():
 			#combined2 = combined2.substring(0, str.length() - 3)
 			#combined2 = combined2 + str(".out")
 			f2 = open(combined2, "x")
-			f2.write(str(numBestAttractions))
+			f2.write(str(len(listBestAttractions)))
 			f2.write("\n")
-			for i in range(numBestAttractions):
+			for i in range(len(listBestAttractions)):
 
 				# for understanding output
-				print(i)
-				print(len(listBestAttractions))
 
-				if (i < (numBestAttractions-1)):
+				if (i < (len(listBestAttractions))):
 					f2.write(str(listBestAttractions[i]))
 					f2.write(" ")
 				else:
 					f2.write(str(listBestAttractions[i]))
-			print(f.readlines())
+			# print(f.readlines())
 		else:
 			continue
 
