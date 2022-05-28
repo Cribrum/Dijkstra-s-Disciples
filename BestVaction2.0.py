@@ -34,7 +34,7 @@ def solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList
 				break
 		if (len(nextJob) == 0):
 			break
-		globalTime += nextJob[1][1]
+		globalTime += nextJob[1][1] # might have to account for   
 		#globalTime += nextJob[0][5]
 		if (globalTime <= 1440): # might have to account for this in simulated_annealing if running into issues
 			#print(globalTime)
@@ -55,8 +55,8 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 		curr_edge = np.random.choice(listBestAttractions, p=p_list) # The random edge we are breaking greedy from
 	except:
 		return len(listBestAttractions), listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
-	curr_edge_best_attraction_index = listBestAttractions.index(curr_edge)
-	if curr_edge == listBestAttractions[-1]: # if there are no edges after the current_edge (ex. if we only visit one edge), return the greedy output
+	curr_edge_best_attraction_index = listBestAttractions.index(curr_edge) #the index of this in our final attractions list from greedy
+	if curr_edge == listBestAttractions[-1]: # if there are no edges after the current_edge (ex. if we only visit one edge in Greedy), return the greedy output
 		return len(listBestAttractions), listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
 	else:
 		# print(utilPerTimes)
@@ -66,7 +66,7 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 
 		# print(attractions)
 		# print(attractions[curr_edge-1])
-		curr_attraction = attractions[curr_edge-1]
+		curr_attraction = attractions[curr_edge-1] # finds the attraction values of our curr_attraction
 		globalTime = curr_attraction[8] # updates global time to reflect we are at curr_attraction
 
 		attractions_visited = []
@@ -113,18 +113,18 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 
 		new_edge = random.choice(valid_next_indices)
 
-		attractions_visited.append(new_edge)
+		attractions_visited.append(new_edge+1)
 
 		# print(new_edge)
 
 		# new num_best attractions is irrelevant ig, weird
 
 
-		attractions[new_edge-1][7] = True
+		attractions[new_edge][7] = True
 
-		globalTime += attractions[new_edge-1][6]
+		globalTime += attractions[new_edge][6]
 
-		new_numBestAttractions, new_listBestAttractions, new_finalUtilVal, attractions = solve(N, attractions, [attractions[new_edge-1][0], attractions[new_edge-1][1]], globalTime, finalUtilVal, attractions_visited)
+		new_numBestAttractions, new_listBestAttractions, new_finalUtilVal, attractions = solve(N, attractions, [attractions[new_edge][0], attractions[new_edge][1]], globalTime, finalUtilVal, attractions_visited)
 
 		if new_finalUtilVal > finalUtilVal:
 			return len(new_listBestAttractions), new_listBestAttractions, new_finalUtilVal, attractions, epoch, attraction_util_dict
