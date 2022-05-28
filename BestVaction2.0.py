@@ -89,6 +89,7 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 		valid_next_indices = []
 		for i in range(N):
 			TimeBackToEnd = math.ceil(math.sqrt(pow((200 - attractions[i][0]), 2) + pow((200 - attractions[i][1]), 2)))
+			# print(attractions[i][6])
 			# print(attractions[i][5])
 			# print(attractions[i][3])
 			if (((globalTime + attractions[i][6] - attractions[i][5]) <= attractions[i][3]) and (attractions[i][7] == False) and ((globalTime + attractions[i][6] + TimeBackToEnd) < 1440)):
@@ -97,10 +98,16 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 				valid_next_indices.append(i)
 				# valid_next_attractions.append(attractions[i]) # if I am getting weird ouput, mayb this should just be i? I have no idea how the indexing works
 		
-		# print(valid_next_attractions)
+		# print(valid_next_indices)
 
 		if valid_next_indices == []: # TODO: Figure out why this would be empty (shouldn't be since Greedy finds val)
-			return len(listBestAttractions), listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
+			# return len(listBestAttractions), listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
+			print(curr_edge)
+			print(curr_attraction)
+			print(finalAttractionList)
+			print(attractions)
+			print('broke')
+			return 0
 
 		# new_edge = random.choice(valid_next_attractions)
 
@@ -238,23 +245,23 @@ def main():
 			# print(numBestAttractions)
 
 			# UNCOMMENT WHEN READY TO RUN:
-			combined2 = "/Users/ariwilson/Desktop/Algorithms/Dijkstra-s-Disciples/all_outputs" + str("/") + str(filename)
-			combined2 = combined2.replace(".in", ".out")
-			#combined2 = combined2.substring(0, str.length() - 3)
-			#combined2 = combined2 + str(".out")
-			f2 = open(combined2, "x")
-			f2.write(str(len(listBestAttractions)))
-			f2.write("\n")
-			for i in range(len(listBestAttractions)):
+			# combined2 = "/Users/ariwilson/Desktop/Algorithms/Dijkstra-s-Disciples/all_outputs" + str("/") + str(filename)
+			# combined2 = combined2.replace(".in", ".out")
+			# #combined2 = combined2.substring(0, str.length() - 3)
+			# #combined2 = combined2 + str(".out")
+			# f2 = open(combined2, "x")
+			# f2.write(str(len(listBestAttractions)))
+			# f2.write("\n")
+			# for i in range(len(listBestAttractions)):
 
-				# for understanding output
+			# 	# for understanding output
 
-				if (i < (len(listBestAttractions))):
-					f2.write(str(listBestAttractions[i]))
-					f2.write(" ")
-				else:
-					f2.write(str(listBestAttractions[i]))
-			# print(f.readlines())
+			# 	if (i < (len(listBestAttractions))):
+			# 		f2.write(str(listBestAttractions[i]))
+			# 		f2.write(" ")
+			# 	else:
+			# 		f2.write(str(listBestAttractions[i]))
+			# # print(f.readlines())
 		else:
 			continue
 
