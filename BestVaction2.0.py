@@ -51,14 +51,19 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 	for i in range(len(temp_list)):
 		total += temp_list[i]
 	p_list = [elem/total for elem in temp_list]
-	curr_edge = np.random.choice(listBestAttractions, p=p_list) # The random edge we are breaking greedy from
+	try:
+		curr_edge = np.random.choice(listBestAttractions, p=p_list) # The random edge we are breaking greedy from
+	except:
+		return numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
 	curr_edge_best_attraction_index = listBestAttractions.index(curr_edge)
 	if curr_edge == listBestAttractions[-1]: # if there are no edges after the current_edge (ex. if we only visit one edge), return the greedy output
-		return numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
+		return len(listBestAttractions), listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
 	else:
 		# print(utilPerTimes)
-		print(curr_edge)
-		print(listBestAttractions)
+
+		# print(curr_edge) #helpful for finding bug
+		# print(listBestAttractions) # ...
+
 		# print(attractions)
 		# print(attractions[curr_edge-1])
 		curr_attraction = attractions[curr_edge-1]
@@ -95,7 +100,7 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 		# print(valid_next_attractions)
 
 		if valid_next_indices == []: # TODO: Figure out why this would be empty (shouldn't be since Greedy finds val)
-			return numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
+			return len(listBestAttractions), listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
 
 		# new_edge = random.choice(valid_next_attractions)
 
@@ -103,7 +108,9 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 
 		attractions_visited.append(new_edge)
 
-		print(new_edge)
+		# print(new_edge)
+
+		# new num_best attractions is irrelevant ig, weird
 
 
 		attractions[new_edge-1][7] = True
@@ -113,7 +120,7 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 		new_numBestAttractions, new_listBestAttractions, new_finalUtilVal, attractions = solve(N, attractions, [attractions[new_edge-1][0], attractions[new_edge-1][1]], globalTime, finalUtilVal, attractions_visited)
 
 		if new_finalUtilVal > finalUtilVal:
-			return new_numBestAttractions, new_listBestAttractions, new_finalUtilVal, attractions, epoch, attraction_util_dict
+			return len(new_listBestAttractions), new_listBestAttractions, new_finalUtilVal, attractions, epoch, attraction_util_dict
 		else:
 			thresh = random.uniform(0,1)
 			temperature = 100000 - .01 * epoch
@@ -121,9 +128,9 @@ def simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, final
 			p = math.exp(exp_val)
 			if p > thresh:
 				attraction_util_dict[finalUtilVal] = numBestAttractions, listBestAttractions
-				return new_numBestAttractions, new_listBestAttractions, new_finalUtilVal, attractions, epoch, attraction_util_dict
+				return len(new_listBestAttractions), new_listBestAttractions, new_finalUtilVal, attractions, epoch, attraction_util_dict
 			else:
-				return numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
+				return len(listBestAttractions), listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict
 
 
 
@@ -141,12 +148,16 @@ def run_simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, f
 	while epoch < 100:
 		numBestAttractions, listBestAttractions, finalUtilVal, attractions, epoch, attraction_util_dict = simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList,epoch, attraction_util_dict, numBestAttractions, listBestAttractions)
 		epoch += 1
-	print(attraction_util_dict)
+	# print(attraction_util_dict)
 	if attraction_util_dict == {}:
 		return numBestAttractions, listBestAttractions
 	elif finalUtilVal >= max(attraction_util_dict):
+		# print("sim f util")
+		# print(max(attraction_util_dict))
 		return numBestAttractions, listBestAttractions
 	else:
+		# print("sim f util")
+		# print(max(attraction_util_dict))
 		return attraction_util_dict[max(attraction_util_dict)]
 	# return max(new_finalUtilVal, max(attraction_util_dict))
 
@@ -212,25 +223,32 @@ def main():
 			numBestAttractions, listBestAttractions, finalUtilVal, attractions = solve(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)
 			# print(numBestAttractions)
 			# print(listBestAttractions)
+
+			# print("greedy final util val:")
 			# print(finalUtilVal)
+
 			# print(attractions)
-			run_simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)
+			numBestAttractions = run_simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)[0]
+			listBestAttractions = run_simulated_annealing(N, attractions, currPos, globalTime, finalUtilVal, finalAttractionList)[1]
+			print(listBestAttractions)
 
 			# UNCOMMENT WHEN READY TO RUN:
-			# combined2 = "/Users/ariwilson/Desktop/Algorithms/Dijkstra-s-Disciples/all_outputs" + str("/") + str(filename)
-			# combined2 = combined2.replace(".in", ".out")
-			# #combined2 = combined2.substring(0, str.length() - 3)
-			# #combined2 = combined2 + str(".out")
-			# f2 = open(combined2, "x")
-			# f2.write(str(numBestAttractions))
-			# f2.write("\n")
-			# for i in range(numBestAttractions):
-			# 	if (i < (numBestAttractions-1)):
-			# 		f2.write(str(listBestAttractions[i]))
-			# 		f2.write(" ")
-			# 	else:
-			# 		f2.write(str(listBestAttractions[i]))
-			#print(f.readlines())
+			combined2 = "/Users/ariwilson/Desktop/Algorithms/Dijkstra-s-Disciples/all_outputs" + str("/") + str(filename)
+			combined2 = combined2.replace(".in", ".out")
+			#combined2 = combined2.substring(0, str.length() - 3)
+			#combined2 = combined2 + str(".out")
+			f2 = open(combined2, "x")
+			f2.write(str(numBestAttractions))
+			f2.write("\n")
+			for i in range(numBestAttractions):
+				print(i)
+				print(len(listBestAttractions))
+				if (i < (numBestAttractions-1)):
+					f2.write(str(listBestAttractions[i]))
+					f2.write(" ")
+				else:
+					f2.write(str(listBestAttractions[i]))
+			print(f.readlines())
 		else:
 			continue
 
